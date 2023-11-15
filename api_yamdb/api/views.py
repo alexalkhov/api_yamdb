@@ -78,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с профилем полязователя."""
 
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser)
+    permission_classes = (permissions.IsAdminUser,)
     queryset = User.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -96,6 +96,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(MixinCategoryAndGenre):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAuthorModeratorAdminSuperuserOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter)
     search_fields = ('name',)
@@ -105,6 +106,7 @@ class CategoryViewSet(MixinCategoryAndGenre):
 class GenreViewSet(MixinCategoryAndGenre):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAuthorModeratorAdminSuperuserOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter)
     search_fields = ('name',)

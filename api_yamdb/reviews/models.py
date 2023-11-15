@@ -1,19 +1,25 @@
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator
+)
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
+class User(AbstractUser):
     """Модель пользователя."""
+
     class Role(models.TextChoices):
         user = 'user'
         moderator = 'moderator'
         admin = 'admin'
-        username = models.TextField(
-            'логин',
-            max_length=150,
-            unique=True,
-            validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')]
-        )
+    username = models.TextField(
+        'логин',
+        max_length=150,
+        unique=True,
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')]
+    )
     first_name = models.TextField('имя', max_length=150, blank=True)
     last_name = models.TextField('фамилия', max_length=150, blank=True)
     email = models.EmailField(unique=True, max_length=254)
@@ -129,7 +135,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
     text = models.TextField('Текст отзыва')
     score = models.PositiveSmallIntegerField(
@@ -163,7 +169,7 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
 
     def __str__(self):
