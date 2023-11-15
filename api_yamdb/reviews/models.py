@@ -1,4 +1,5 @@
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 
 
@@ -112,6 +113,7 @@ class Title(models.Model):
 
 class Review(models.Model):
     """Модель отзывов."""
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -144,6 +146,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель комментариев."""
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -151,6 +154,7 @@ class Comment(models.Model):
         verbose_name='Автор комментария'
     )
     review = models.ForeignKey(
+        Review,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария'
