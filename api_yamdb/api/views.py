@@ -107,7 +107,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """ViewSet отзывов"""
+    """Вьюсет для работы с отзывами"""
     serializer_class = ReviewSeriallizers
     permission_classes = (
         IsAuthorModeratorAdminSuperuserOrReadOnly,
@@ -132,7 +132,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """ViewSet комментариев"""
+    """Вьюсет для работы с комментариями"""
     serializer_class = CommentSeriallizers
     permission_classes = (
         IsAuthorModeratorAdminSuperuserOrReadOnly,
