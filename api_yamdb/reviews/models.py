@@ -2,6 +2,8 @@ from django.db import models
 
 
 class Category(models.Model):
+    """Категории (типы) произведений."""
+
     name = models.CharField(
         'Категории',
         max_length=256,
@@ -22,6 +24,8 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
+    """Категории жанров."""
+
     name = models.CharField(
         'Жанры',
         max_length=256,
@@ -42,6 +46,10 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
+    """Произведения, к которым пишут отзывы.
+    (определённый фильм, книга или песенка).
+    """
+
     name = models.CharField(
         'Название',
         max_length=256,
@@ -68,7 +76,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('-year',)
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 

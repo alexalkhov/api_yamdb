@@ -1,24 +1,31 @@
-from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
 
-from reviews.models import Title
+
+from api.mixins import MixinCategoryAndGenre
+from api.serializers import (
+    CategorySerializer,
+    GenreSerializer,
+)
+from reviews.models import Category, Genre, Title
+
+
+class CategoryViewSet(MixinCategoryAndGenre):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter)
+    search_fields = ('name',)
+    pagination_class = None
+
+
+class GenreViewSet(MixinCategoryAndGenre):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter)
+    search_fields = ('name',)
+    pagination_class = None
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    permission_classes = (...)
-    filter_backends = (DjangoFilterBackend, )
-    filterset_class = ...
-    pagination_class = LimitOffsetPagination
-
-    def get_serializer_class(self):
-        ...
-
-
-class CategoryViewSet:
-    pass
-
-
-class GenreViewSet:
     pass
