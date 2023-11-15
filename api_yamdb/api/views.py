@@ -6,16 +6,22 @@ from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import User
-from .serializers import (TokenCreateSerializer, UserCreateSerializer,
-                          UserSerializer, CategorySerializer, GenreSerializer,)
+from reviews.models import User
+from .serializers import (
+    TokenCreateSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+    CategorySerializer,
+    GenreSerializer,
+)
 from .mixins import MixinCategoryAndGenre
 
 from reviews.models import Category, Genre, Title
 
 
 class UserCreateViewSet(viewsets.ModelViewSet):
-    """Вьюсет для создания пользователя и отправки кода подтверждения"""
+    """Вьюсет для создания пользователя и отправки кода подтверждения."""
+
     serializer_class = UserCreateSerializer
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
@@ -37,7 +43,8 @@ class UserCreateViewSet(viewsets.ModelViewSet):
 
 
 class TokenCreateViewSet(viewsets.ModelViewSet):
-    """Вьюсет для получения токена пользователя"""
+    """Вьюсет для получения токена пользователя."""
+
     serializer_class = TokenCreateSerializer
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
@@ -63,7 +70,8 @@ class TokenCreateViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с профилем полязователя"""
+    """Вьюсет для работы с профилем полязователя."""
+
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAdminUser)
     queryset = User.objects.all()
@@ -76,7 +84,7 @@ class UserViewSet(viewsets.ModelViewSet):
         url_path=r'(?P<username>[\w.@+-]+)'
     )
     def get_action_with_username(self, request, username):
-        """Управление профилем пользователя по его username"""
+        """Управление профилем пользователя по его username."""
         pass
 
 

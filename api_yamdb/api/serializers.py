@@ -1,18 +1,20 @@
 from django.core.validators import RegexValidator
 from rest_framework import serializers
-from .models import User
+from reviews.models import User
 from reviews.models import Category, Genre, Title
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериалайзер для модели пользователя"""
+    """Сериалайзер для модели пользователя."""
+
     class Meta:
         model = User
         fields = '__all__'
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    """Сериалайзер для создания новых пользователей"""
+    """Сериалайзер для создания новых пользователей."""
+
     class Meta:
         model = User
         fields = ('email', 'username')
@@ -34,7 +36,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class TokenCreateSerializer(serializers.ModelSerializer):
-    """Сериалайзер для создания Токена"""
+    """Сериалайзер для создания Токена."""
+
     username = serializers.CharField(
         required=True,
         max_length=150,
