@@ -2,7 +2,7 @@ from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Category, Comment, Genre, Title, Review, User
+from reviews.models import Category, Comment, Genre, Review, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -83,8 +83,8 @@ class ReviewSeriallizers(serializers.ModelSerializer):
             serializers.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
                 fields=['user', 'reviews'],
-                message= ('На одно произведение '
-                'пользователь может оставить только один отзыв.')
+                message=('На одно произведение '
+                         'пользователь может оставить только один отзыв.')
             )
         ]
 

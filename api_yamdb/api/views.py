@@ -8,13 +8,13 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
-from .permissions import IsAuthorModeratorAdminSuperuserOrReadOnly
-from .serializers import (TokenCreateSerializer, UserCreateSerializer,
-                          UserSerializer, CategorySerializer, GenreSerializer,
-                          CommentSeriallizers, ReviewSeriallizers)
-from .mixins import MixinCategoryAndGenre
-
-from reviews.models import Category, Genre, Title, Review, User
+from api.mixins import MixinCategoryAndGenre
+from api.permissions import IsAuthorModeratorAdminSuperuserOrReadOnly
+from api.serializers import (CategorySerializer, CommentSeriallizers,
+                             GenreSerializer, ReviewSeriallizers,
+                             TokenCreateSerializer, UserCreateSerializer,
+                             UserSerializer)
+from reviews.models import Category, Genre, Review, Title, User
 
 
 class UserCreateViewSet(viewsets.ModelViewSet):
