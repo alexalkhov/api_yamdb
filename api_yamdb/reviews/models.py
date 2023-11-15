@@ -1,8 +1,13 @@
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator
+)
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
+class User(AbstractUser):
     """Модель пользователя."""
     class Role(models.TextChoices):
         user = 'user'
@@ -151,6 +156,7 @@ class Comment(models.Model):
         verbose_name='Автор комментария'
     )
     review = models.ForeignKey(
+        Review,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария'

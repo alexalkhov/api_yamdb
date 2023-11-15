@@ -8,14 +8,13 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
-from .models import User
 from .permissions import IsAuthorModeratorAdminSuperuserOrReadOnly
 from .serializers import (TokenCreateSerializer, UserCreateSerializer,
                           UserSerializer, CategorySerializer, GenreSerializer,
                           CommentSeriallizers, ReviewSeriallizers)
 from .mixins import MixinCategoryAndGenre
 
-from reviews.models import Category, Genre, Title, Review
+from reviews.models import Category, Genre, Title, Review, User
 
 
 class UserCreateViewSet(viewsets.ModelViewSet):
@@ -69,7 +68,7 @@ class TokenCreateViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с профилем полязователя"""
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser)
+    permission_classes = (permissions.IsAdminUser,)
     queryset = User.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -120,10 +119,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
             Title,
             pk=self.kwargs.get('title_id')
         )
-    
+
     def get_queryset(self):
         return self.get_title().reviews.all()
-    
+
     def perform_create(self, serializer):
         return serializer.save(
             author=self.request.user,
@@ -146,12 +145,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             pk=self.kwargs.get('review_id'),
             title_id=self.kwargs.get('title_id')
         )
-    
+
     def get_queryset(self):
         return self.get_review().comments.all()
-    
+
     def perform_create(self, serializer):
-        return  serializer.save(
+        return serializer.save(
             author=self.request.user,
             review=self.get_review()
         )

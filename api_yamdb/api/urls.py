@@ -25,12 +25,12 @@ v1_router.register(
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
     path(
-        'v1/auth/singup/',
+        'v1/auth/signup/',
         UserCreateViewSet.as_view({'post': 'create'}),
-        name='singup'
+        name='signup'
     ),
     path(
-        'v1/auth/token',
+        'v1/auth/token/',
         TokenCreateViewSet.as_view({'post': 'create'}),
         name='token'
     )
