@@ -1,9 +1,20 @@
-from django.urls import include, path
+from django.urls import path
+from rest_framework import routers
+
+from .views import TokenCreateViewSet, UserCreateViewSet, UserViewSet
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
-    path('api/v1/', include('djoser.urls')),
-    path('api/v1/', include('djoser.urls.jwt')),
-    path('api/v1/auth/singup/',),
-    path('api/v1/auth/token',),
-    path('api/v1/users/me/',),
+    path(
+        'v1/auth/singup/',
+        UserCreateViewSet.as_view({'post': 'create'}),
+        name='singup'
+    ),
+    path(
+        'v1/auth/token',
+        TokenCreateViewSet.as_view({'post': 'create'}),
+        name='token'
+    )
 ]

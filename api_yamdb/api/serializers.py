@@ -1,4 +1,6 @@
+from django.core.validators import RegexValidator
 from rest_framework import serializers
+
 from .models import User
 
 
@@ -31,15 +33,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class CreateUserTokenSerializer(serializers.ModelSerializer):
+class TokenCreateSerializer(serializers.ModelSerializer):
     """Сериалайзер для создания Токена"""
     username = serializers.CharField(
         required=True,
-        max_lenght=150,
-        regex=r'^[\w.@+-]+\Z'
+        max_length=150,
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')]
     )
-    confirmation_code = serializers.CharField(required=True, max_lenght=150)
+    confirmation_code = serializers.CharField(required=True, max_length=150)
 
     class Meta:
         model = User
-        field = ('username', 'confirmation_code')
+        fields = ('username', 'confirmation_code')

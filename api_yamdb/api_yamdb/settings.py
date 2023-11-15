@@ -70,6 +70,9 @@ DATABASES = {
 }
 
 
+SENT_CODE_EMAIL = 'yamdb_no_reply@yandex.ru'
+
+
 # Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
