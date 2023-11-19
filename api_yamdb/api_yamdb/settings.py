@@ -1,7 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -14,9 +13,6 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'reviews.User'
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'djoser',
     'api.apps.ApiConfig',
     'reviews.apps.ReviewsConfig',
@@ -60,7 +57,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
-
 
 # Database
 
@@ -120,6 +116,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 3,
 }
 
 SIMPLE_JWT = {

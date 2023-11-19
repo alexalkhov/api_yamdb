@@ -1,7 +1,6 @@
 from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-
 from reviews.models import Category, Comment, Genre, Review, User
 
 
@@ -9,11 +8,14 @@ class UserSerializer(serializers.ModelSerializer):
     """Сериалайзер для модели пользователя"""
     class Meta:
         model = User
-        fields = '__all__'
+        fields = (
+            'username', 'first_name', 'last_name', 'email', 'bio', 'role'
+        )
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
     """Сериалайзер для создания новых пользователей"""
+
     class Meta:
         model = User
         fields = ('email', 'username')
@@ -23,14 +25,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя использовать это имя пользователя'
             )
-        if User.objects.filter(username=data['username']):
-            raise serializers.ValidationError(
-                'Такое имя пользователя уже существует'
-            )
-        if User.objects.filter(email=data['email']):
-            raise serializers.ValidationError(
-                'Такой адрес электронной почты уже существует'
-            )
+        # if User.objects.filter(username=data['username']):
+        #     raise serializers.ValidationError(
+        #         'Такое имя пользователя уже существует'
+        #     )
+        # if User.objects.filter(email=data['email']):
+        #     raise serializers.ValidationError(
+        #         'Такой адрес электронной почты уже существует'
+        #     )
         return data
 
 
