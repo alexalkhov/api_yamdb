@@ -3,11 +3,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-# from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from api.permissions import (
@@ -15,6 +16,7 @@ from api.permissions import (
     IsAdminOrReadOnly,
 )
 from api.serializers import (
+    TitleReadSerializer,
     TokenCreateSerializer,
     UserCreateSerializer,
     UserSerializer,
@@ -22,10 +24,10 @@ from api.serializers import (
     GenreSerializer,
     CommentSerializer,
     ReviewSerializer,
-    TitleSerializer,
+    TitleCreateSerializer,
 )
 from api.mixins import MixinCategoryAndGenre
-# from api.filtres import TitleFilter
+from api.filtres import TitleFilter
 
 from reviews.models import Category, Genre, Title, Review
 
@@ -100,6 +102,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(MixinCategoryAndGenre):
+    """Вьюсет для работы с категориями."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -110,6 +114,8 @@ class CategoryViewSet(MixinCategoryAndGenre):
 
 
 class GenreViewSet(MixinCategoryAndGenre):
+    """Вьюсет для работы с жанрами."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -120,16 +126,35 @@ class GenreViewSet(MixinCategoryAndGenre):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с произведениями."""
+
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleCreateSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = LimitOffsetPagination
-    # filter_backends = (DjangoFilterBackend, )
-    # filterset_class = TitleFilter
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class  = TitleFilter
 
-    def get_permissions(self):
-        if 
-        return super().get_permissions()
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return super().get_serializer_class()
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+
+        if len(serializer.validated_data.get('name')) > 256:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
