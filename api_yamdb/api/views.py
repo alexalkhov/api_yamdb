@@ -3,27 +3,23 @@ from django.contrib.auth import login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title, User
+
+from api.filtres import TitleFilter
 from api.mixins import MixinCategoryAndGenre
-from api.permissions import (IsAuthorModeratorAdminSuperuserOrReadOnly,
-                             IsAdminOrReadOnly,
+from api.permissions import (IsAdminOrReadOnly,
+                             IsAuthorModeratorAdminSuperuserOrReadOnly,
                              UserCustomPermission)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
+                             TitleCreateSerializer, TitleReadSerializer,
                              TokenCreateSerializer, UserCreateSerializer,
                              UserSerializer)
-from django_filters.rest_framework import DjangoFilterBackend
-from api.serializers import (TitleReadSerializer, TokenCreateSerializer,
-                             UserCreateSerializer, UserSerializer,
-                             CategorySerializer, GenreSerializer,
-                             CommentSerializer, ReviewSerializer,
-                             TitleCreateSerializer,)
-from api.filtres import TitleFilter
 
 
 class UserCreateViewSet(viewsets.ModelViewSet):
@@ -90,7 +86,7 @@ class UserViewSet(viewsets.ModelViewSet):
         url_path=r'(?P<username>[\w.@+-]+)',
     )
     def username_actions(self, request, username):
-        """Действия с пользователем по username"""
+        """Действия с пользователем по username."""
         user = get_object_or_404(User, username=username)
         if request.method == 'GET':
             if not request.auth:
@@ -117,13 +113,13 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def me(self, request):
-        """Получение пользовательских данных"""
+        """Получение пользовательских данных."""
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @me.mapping.patch
     def change_me_data(self, request):
-        """Изменение пользовательских данных"""
+        """Изменение пользовательских данных."""
         serializer = UserSerializer(
             request.user,
             data=request.data,

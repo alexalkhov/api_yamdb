@@ -1,10 +1,10 @@
 from django.core.validators import RegexValidator
 from django.db.models import Avg
 from django.forms import ValidationError
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from django.utils import timezone
-from reviews.models import Category, Comment, Genre, Title, Review, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.Serializer):
-    """Сериалайзер для создания новых пользователей"""
+    """Сериалайзер для создания новых пользователей."""
 
     email = serializers.EmailField(required=True, max_length=254)
     username = serializers.CharField(
@@ -148,7 +148,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    """Сериализатор отзывов"""
+    """Сериализатор отзывов."""
 
     author = SlugRelatedField(
         slug_field='username',
@@ -173,7 +173,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор комментариев"""
+    """Сериализатор комментариев."""
 
     author = SlugRelatedField(
         slug_field='username',

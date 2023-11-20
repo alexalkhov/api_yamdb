@@ -21,10 +21,12 @@ class User(AbstractUser):
     last_name = models.TextField('фамилия', max_length=150, blank=True)
     email = models.EmailField(max_length=254, unique=True)
     bio = models.TextField('биография', blank=True)
-    role = models.CharField('роль',
-                            max_length=150,
-                            choices=Role.choices,
-                            default=Role.user)
+    role = models.CharField(
+        'роль',
+        max_length=150,
+        choices=Role.choices,
+        default=Role.user
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -76,7 +78,8 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    """Произведения, к которым пишут отзывы.
+    """
+    Произведения, к которым пишут отзывы.
     (определённый фильм, книга или песенка).
     """
 
