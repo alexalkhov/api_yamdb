@@ -18,17 +18,11 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              TokenCreateSerializer, UserCreateSerializer,
                              UserSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
-from api.serializers import (
-    TitleReadSerializer,
-    TokenCreateSerializer,
-    UserCreateSerializer,
-    UserSerializer,
-    CategorySerializer,
-    GenreSerializer,
-    CommentSerializer,
-    ReviewSerializer,
-    TitleCreateSerializer,
-)
+from api.serializers import (TitleReadSerializer, TokenCreateSerializer,
+                             UserCreateSerializer, UserSerializer,
+                             CategorySerializer, GenreSerializer,
+                             CommentSerializer, ReviewSerializer,
+                             TitleCreateSerializer,)
 from api.filtres import TitleFilter
 
 
@@ -205,6 +199,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     )
     pagination_class = LimitOffsetPagination
+    http_method_names = ['get', 'post', 'delete', 'patch']
 
     def get_title(self):
         return get_object_or_404(
@@ -231,6 +226,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     )
     pagination_class = LimitOffsetPagination
+    http_method_names = ['get', 'post', 'delete', 'patch']
 
     def get_review(self):
         return get_object_or_404(
