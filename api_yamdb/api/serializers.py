@@ -13,29 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-# class UserCreateSerializer(serializers.ModelSerializer):
-#     """Сериалайзер для создания новых пользователей"""
-
-#     class Meta:
-#         model = User
-#         fields = ('email', 'username')
-
-
-#     def validate(self, data):
-#         if data['username'] == 'me':
-#             raise serializers.ValidationError(
-#                 'Нельзя использовать это имя пользователя'
-#             )
-#         # elif User.objects.filter(username=data['username']):
-#         #     raise serializers.ValidationError(
-#         #         'Такое имя пользователя уже существует'
-#         #     )
-#         # elif User.objects.filter(email=data['email']):
-#         #     raise serializers.ValidationError(
-#         #         'Такой адрес электронной почты уже существует'
-#         #     )
-#         return data
-
 class UserCreateSerializer(serializers.Serializer):
     """Сериалайзер для создания новых пользователей"""
 
