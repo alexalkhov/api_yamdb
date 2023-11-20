@@ -3,23 +3,38 @@ from django.contrib.auth import login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title, User
-
 from api.mixins import MixinCategoryAndGenre
 from api.permissions import (IsAuthorModeratorAdminSuperuserOrReadOnly,
+                             IsAdminOrReadOnly,
                              UserCustomPermission)
 from api.serializers import (CategorySerializer, CommentSeriallizers,
                              GenreSerializer, ReviewSeriallizers,
                              TokenCreateSerializer, UserCreateSerializer,
                              UserSerializer)
+from django_filters.rest_framework import DjangoFilterBackend
+from api.serializers import (
+    TitleReadSerializer,
+    TokenCreateSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    CommentSerializer,
+    ReviewSerializer,
+    TitleCreateSerializer,
+)
+from api.filtres import TitleFilter
 
 
 class UserCreateViewSet(viewsets.ModelViewSet):
-    """Вьюсет для создания пользователя и отправки кода подтверждения"""
+    """Вьюсет для создания пользователя и отправки кода подтверждения."""
+
     serializer_class = UserCreateSerializer
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
@@ -44,7 +59,8 @@ class UserCreateViewSet(viewsets.ModelViewSet):
 
 
 class TokenCreateViewSet(viewsets.ModelViewSet):
-    """Вьюсет для получения токена пользователя"""
+    """Вьюсет для получения токена пользователя."""
+
     serializer_class = TokenCreateSerializer
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
@@ -66,7 +82,8 @@ class TokenCreateViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с профилем полязователя"""
+    """Вьюсет для работы с профилем полязователя."""
+
     serializer_class = UserSerializer
     permission_classes = (UserCustomPermission,)
     queryset = User.objects.all()
@@ -78,6 +95,7 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['get', 'patch', 'delete'],
         url_path=r'(?P<username>[\w.@+-]+)',
     )
+    
     def username_actions(self, request, username):
         """Действия с пользователем по username"""
         user = get_object_or_404(User, username=username)
@@ -124,30 +142,65 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(MixinCategoryAndGenre):
+    """Вьюсет для работы с категориями."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pagination_class = None
+    pagination_class = LimitOffsetPagination
 
 
 class GenreViewSet(MixinCategoryAndGenre):
+    """Вьюсет для работы с жанрами."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pagination_class = None
+    pagination_class = LimitOffsetPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    pass
+    """Вьюсет для работы с произведениями."""
+
+    queryset = Title.objects.all()
+    serializer_class = TitleCreateSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class  = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return super().get_serializer_class()
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+
+        if len(serializer.validated_data.get('name')) > 256:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с отзывами"""
-    serializer_class = ReviewSeriallizers
+    """Вьюсет для работы с отзывами."""
+
+    serializer_class = ReviewSerializer
     permission_classes = (
         IsAuthorModeratorAdminSuperuserOrReadOnly,
         permissions.IsAuthenticatedOrReadOnly,
@@ -171,8 +224,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с комментариями"""
-    serializer_class = CommentSeriallizers
+    """Вьюсет для работы с комментариями."""
+
+    serializer_class = CommentSerializer
     permission_classes = (
         IsAuthorModeratorAdminSuperuserOrReadOnly,
         permissions.IsAuthenticatedOrReadOnly,

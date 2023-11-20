@@ -6,6 +6,7 @@ from django.db import models
 
 class User(AbstractUser):
     """Модель пользователя."""
+
     class Role(models.TextChoices):
         user = 'user'
         moderator = 'moderator'
@@ -14,7 +15,8 @@ class User(AbstractUser):
         'логин',
         max_length=150,
         unique=True,
-        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')])
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')]
+    )
     first_name = models.TextField('имя', max_length=150, blank=True)
     last_name = models.TextField('фамилия', max_length=150, blank=True)
     email = models.EmailField(max_length=254, unique=True)
@@ -48,7 +50,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.slug}'
 
 
 class Genre(models.Model):
@@ -70,7 +72,7 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.slug}'
 
 
 class Title(models.Model):
@@ -130,7 +132,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
     text = models.TextField('Текст отзыва')
     score = models.PositiveSmallIntegerField(
@@ -164,7 +166,7 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
 
     def __str__(self):
