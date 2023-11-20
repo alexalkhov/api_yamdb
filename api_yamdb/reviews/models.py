@@ -10,14 +10,27 @@ class User(AbstractUser):
         user = 'user'
         moderator = 'moderator'
         admin = 'admin'
-    username = models.TextField(
+    # username = models.TextField(
+    #     'логин',
+    #     max_length=150,
+    #     unique=True,
+    #     validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')])
+    # first_name = models.TextField('имя', max_length=150, blank=True)
+    # last_name = models.TextField('фамилия', max_length=150, blank=True)
+    # email = models.EmailField(max_length=254, unique=True)
+    # bio = models.TextField('биография', blank=True)
+    # role = models.CharField('роль',
+    #                         max_length=150,
+    #                         choices=Role.choices,
+    #                         default=Role.user)
+    username = models.CharField(
         'логин',
         max_length=150,
         unique=True,
         validators=[RegexValidator(regex=r'^[\w.@+-]+\Z')])
     first_name = models.TextField('имя', max_length=150, blank=True)
     last_name = models.TextField('фамилия', max_length=150, blank=True)
-    email = models.EmailField(unique=True, max_length=254)
+    email = models.EmailField(max_length=254, unique=True)
     bio = models.TextField('биография', blank=True)
     role = models.CharField('роль',
                             max_length=150,

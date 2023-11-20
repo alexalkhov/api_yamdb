@@ -28,8 +28,10 @@ class UserCreateViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
-        user = User(**serializer.validated_data)
-        user.save()
+        username = serializer.validated_data['username']
+        user, created = User.objects.get_or_create(
+            email=email, username=username
+        )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             subject='Код для входа',
