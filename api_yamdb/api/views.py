@@ -13,8 +13,8 @@ from api.mixins import MixinCategoryAndGenre
 from api.permissions import (IsAuthorModeratorAdminSuperuserOrReadOnly,
                              IsAdminOrReadOnly,
                              UserCustomPermission)
-from api.serializers import (CategorySerializer, CommentSeriallizers,
-                             GenreSerializer, ReviewSeriallizers,
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, ReviewSerializer,
                              TokenCreateSerializer, UserCreateSerializer,
                              UserSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
@@ -95,7 +95,6 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['get', 'patch', 'delete'],
         url_path=r'(?P<username>[\w.@+-]+)',
     )
-    
     def username_actions(self, request, username):
         """Действия с пользователем по username"""
         user = get_object_or_404(User, username=username)
@@ -173,7 +172,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_class  = TitleFilter
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
