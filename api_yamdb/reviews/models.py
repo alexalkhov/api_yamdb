@@ -138,13 +138,18 @@ class Review(models.Model):
     score = models.PositiveSmallIntegerField(
         'Оценка произведения',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10),
+            MinValueValidator(1, message='Оценка от 1'),
+            MaxValueValidator(10, message='Оценка до 10'),
         ]
     )
 
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
     def __str__(self):
-        return self.name
+        return self.text
 
 
 class Comment(models.Model):
@@ -169,5 +174,10 @@ class Comment(models.Model):
         db_index=True,
     )
 
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
     def __str__(self):
-        return self.name
+        return self.text
