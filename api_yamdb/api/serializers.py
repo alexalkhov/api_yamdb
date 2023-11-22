@@ -110,6 +110,13 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_name(self, value):
+        if len(value) > 256:
+            raise serializers.ValidationError(
+                'Название произведения не может быть длиннее 256 символов.'
+            )
+        return value
+
     class Meta:
         model = Title
         fields = (
