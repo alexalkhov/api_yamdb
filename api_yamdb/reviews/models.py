@@ -1,10 +1,7 @@
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-    RegexValidator
-)
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
+from django.db import models
 
 
 class User(AbstractUser):
@@ -14,7 +11,7 @@ class User(AbstractUser):
         user = 'user'
         moderator = 'moderator'
         admin = 'admin'
-    username = models.TextField(
+    username = models.CharField(
         'логин',
         max_length=150,
         unique=True,
@@ -22,12 +19,14 @@ class User(AbstractUser):
     )
     first_name = models.TextField('имя', max_length=150, blank=True)
     last_name = models.TextField('фамилия', max_length=150, blank=True)
-    email = models.EmailField(unique=True, max_length=254)
+    email = models.EmailField(max_length=254, unique=True)
     bio = models.TextField('биография', blank=True)
-    role = models.CharField('роль',
-                            max_length=150,
-                            choices=Role.choices,
-                            default=Role.user)
+    role = models.CharField(
+        'роль',
+        max_length=150,
+        choices=Role.choices,
+        default=Role.user
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -79,7 +78,8 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    """Произведения, к которым пишут отзывы.
+    """
+    Произведения, к которым пишут отзывы.
     (определённый фильм, книга или песенка).
     """
 
@@ -135,19 +135,29 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True,
+        db_index=True
     )
     text = models.TextField('Текст отзыва')
     score = models.PositiveSmallIntegerField(
         'Оценка произведения',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10),
+            MinValueValidator(1, message='Оценка от 1'),
+            MaxValueValidator(10, message='Оценка до 10'),
         ]
     )
 
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('author', 'title'), name='unique_review'
+            )
+        ]
+
     def __str__(self):
-        return self.name
+        return self.text
 
 
 class Comment(models.Model):
@@ -169,8 +179,13 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
-        db_index=True,
+        db_index=True
     )
 
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
     def __str__(self):
-        return self.name
+        return self.text
