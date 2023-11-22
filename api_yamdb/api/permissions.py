@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from reviews.models import User
+from users.models import User
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -28,11 +28,11 @@ class IsAuthorModeratorAdminSuperuserOrReadOnly(permissions.BasePermission):
         )
 
 
-class UserCustomPermission(permissions.BasePermission):
-    message = ('Ограничение действий для эндпоиста username')
+class UserPermission(permissions.BasePermission):
+    message = ('Ограничение действий для эндпоиста username.')
 
     def has_permission(self, request, view):
-        if view.action == 'list' or request.method in [
+        if request.method in [
             'DELETE', 'PATCH', 'GET'
         ]:
             return (

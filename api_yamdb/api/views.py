@@ -1,20 +1,21 @@
-from api_yamdb.settings import SENT_CODE_EMAIL
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from reviews.models import Category, Genre, Review, Title, User
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 from api.filtres import TitleFilter
 from api.mixins import MixinCategoryAndGenre
 from api.permissions import (IsAdminOrReadOnly,
                              IsAuthorModeratorAdminSuperuserOrReadOnly,
-                             UserCustomPermission)
+                             UserPermission)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
                              TitleCreateSerializer, TitleReadSerializer,
@@ -22,7 +23,7 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              UserSerializer)
 
 
-class UserCreateViewSet(viewsets.ModelViewSet):
+class UserCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """Вьюсет для создания пользователя и отправки кода подтверждения."""
 
     serializer_class = UserCreateSerializer
@@ -34,14 +35,15 @@ class UserCreateViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         username = serializer.validated_data['username']
-        user, created = User.objects.get_or_create(
-            email=email, username=username
+        user, _ = User.objects.get_or_create(
+            email=email,
+            username=username
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             subject='Код для входа',
             message=f'Ваш код для входа на портал YAMDB: {confirmation_code}',
-            from_email=SENT_CODE_EMAIL,
+            from_email=settings.SENT_CODE_EMAIL,
             recipient_list=[email],
             fail_silently=False,
         )
@@ -75,36 +77,41 @@ class UserViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с профилем полязователя."""
 
     serializer_class = UserSerializer
-    permission_classes = (UserCustomPermission,)
+    permission_classes = (UserPermission,)
     queryset = User.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
     @action(
         detail=False,
-        methods=['get', 'patch', 'delete'],
+        methods=['get'],
         url_path=r'(?P<username>[\w.@+-]+)',
     )
-    def username_actions(self, request, username):
-        """Действия с пользователем по username."""
+    def get_user(self, request, username):
+        """Получение данных пользователя по username."""
         user = get_object_or_404(User, username=username)
-        if request.method == 'GET':
-            if not request.auth:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.method == 'PATCH':
-            serializer = UserSerializer(
-                user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.method == 'DELETE':
-            user.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @get_user.mapping.patch
+    def patch_user(self, request, username):
+        """Изменение данных пользователя."""
+        user = get_object_or_404(User, username=username)
+        serializer = UserSerializer(
+            user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=user.role)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @get_user.mapping.delete
+    def delete_user(self, request, username):
+        """Удаление пользователя."""
+        user = get_object_or_404(User, username=username)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,
@@ -112,14 +119,14 @@ class UserViewSet(viewsets.ModelViewSet):
         url_path='me',
         permission_classes=[permissions.IsAuthenticated],
     )
-    def me(self, request):
-        """Получение пользовательских данных."""
+    def get_me(self, request):
+        """Получение данных текущего пользователя."""
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @me.mapping.patch
-    def change_me_data(self, request):
-        """Изменение пользовательских данных."""
+    @get_me.mapping.patch
+    def patch_me(self, request):
+        """Изменение данных текущего пользователя."""
         serializer = UserSerializer(
             request.user,
             data=request.data,
