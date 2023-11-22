@@ -169,21 +169,17 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleReadSerializer
         return super().get_serializer_class()
 
-    def update(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()
+        isinstance = self.get_object()
         serializer = self.get_serializer(
-            instance, data=request.data, partial=True
+            isinstance, data=request.data, partial=True
         )
         serializer.is_valid(raise_exception=True)
-
-        if len(serializer.validated_data.get('name')) > 256:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
         self.perform_update(serializer)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
