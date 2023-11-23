@@ -3,6 +3,7 @@ from users.models import User
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
