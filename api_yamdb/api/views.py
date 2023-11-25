@@ -8,18 +8,18 @@ from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from reviews.models import Category, Genre, Review, Title
-from users.models import User
 
 from api.filtres import TitleFilter
 from api.mixins import MixinCategoryAndGenre
-from api.permissions import (IsAdminOrReadOnly, IsAdmin, IsAuthor,
-                             IsModerator, ReadOnly, UserPermission)
+from api.permissions import (IsAdmin, IsAdminOrReadOnly, IsAuthor, IsModerator,
+                             ReadOnly, UserPermission)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
                              TitleCreateSerializer, TitleReadSerializer,
                              TokenCreateSerializer, UserCreateSerializer,
                              UserSerializer)
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 
 class UserCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -80,37 +80,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-
-    @action(
-        detail=False,
-        methods=['get'],
-        url_path=r'(?P<username>[\w.@+-]+)',
-    )
-    def get_user(self, request, username):
-        """Получение данных пользователя по username."""
-        user = get_object_or_404(User, username=username)
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @get_user.mapping.patch
-    def patch_user(self, request, username):
-        """Изменение данных пользователя."""
-        user = get_object_or_404(User, username=username)
-        serializer = UserSerializer(
-            user,
-            data=request.data,
-            partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(role=user.role)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @get_user.mapping.delete
-    def delete_user(self, request, username):
-        """Удаление пользователя."""
-        user = get_object_or_404(User, username=username)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    lookup_field = 'username'
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         detail=False,
